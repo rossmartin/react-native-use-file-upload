@@ -1,0 +1,87 @@
+import { useRef } from 'react';
+// @ts-ignore
+import {
+  FileUploadOptions,
+  OnDoneData,
+  OnErrorData,
+  UploadItem,
+} from '../types';
+
+export default function useFileUpload({
+  url,
+  field,
+  method = 'POST',
+  headers,
+  timeout,
+  onProgress,
+  onDone,
+  onError,
+  onTimeout,
+}: FileUploadOptions) {
+  const requests = useRef<{
+    [key: string]: XMLHttpRequest;
+  }>({});
+
+  const startUpload = (item: UploadItem): Promise<OnDoneData | OnErrorData> => {
+    return new Promise((resolve, reject) => {
+      const formData = new FormData();
+      formData.append(field, item);
+
+      const xhr = new XMLHttpRequest();
+
+      xhr.open(method, url);
+
+      requests.current[item.uri] = xhr;
+
+      if (xhr.upload) {
+        xhr.upload.onprogress = (event: ProgressEvent<EventTarget>) => {
+          onProgress?.({ item, event });
+        };
+      }
+
+      if (timeout) {
+        xhr.timeout = timeout;
+        xhr.ontimeout = () => {
+          const result: OnErrorData = {
+            item,
+            error: xhr.responseText,
+            timeout: true,
+          };
+          onTimeout?.(result);
+          reject(result);
+        };
+      }
+
+      xhr.onload = () => {
+        const result: OnDoneData = {
+          item,
+          responseBody: xhr.response || xhr.responseText,
+          responseHeaders: xhr.getAllResponseHeaders(),
+        };
+        onDone?.(result);
+        resolve(result);
+      };
+
+      xhr.onerror = () => {
+        const result: OnErrorData = {
+          item,
+          error: xhr.responseText,
+        };
+        onError?.(result);
+        reject(result);
+      };
+
+      headers?.forEach((value: string, key: string) => {
+        xhr.setRequestHeader(key, value);
+      });
+
+      xhr.send(formData);
+    });
+  };
+
+  const abortUpload = (uri: string) => {
+    requests.current[uri]?.abort();
+  };
+
+  return { startUpload, abortUpload };
+}
