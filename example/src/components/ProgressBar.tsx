@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef, useEffect } from 'react';
 import { Animated, StyleProp, StyleSheet, View, ViewStyle } from 'react-native';
 
 type Props = {
@@ -12,20 +12,20 @@ export default function ProgressBar({
   style,
   progressColor = '#3880ff',
 }: Props) {
-  const valueAnimated = React.useRef(new Animated.Value(0)).current;
+  const valueAnimated = useRef(new Animated.Value(0)).current;
   const width = valueAnimated.interpolate({
     inputRange: [0, 100],
     outputRange: ['0%', '100%'],
     extrapolate: 'clamp',
   });
 
-  React.useEffect(() => {
+  useEffect(() => {
     Animated.timing(valueAnimated, {
       toValue: value,
       duration: 500,
       useNativeDriver: false,
     }).start();
-  }, [value]);
+  }, [value, valueAnimated]);
 
   return (
     <View style={[styles.progressBar, style]}>

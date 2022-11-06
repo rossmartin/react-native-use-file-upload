@@ -1,6 +1,5 @@
 import { useRef } from 'react';
-// @ts-ignore
-import {
+import type {
   FileUploadOptions,
   OnDoneData,
   OnErrorData,
