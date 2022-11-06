@@ -226,12 +226,10 @@ export default function App() {
         ) : null}
         {item.failed ? (
           <Pressable onPress={onPressRetry(item)}>
-            <Text style={styles.refreshIconText}>&#x21bb;</Text>
+            <Text style={styles.iconText}>&#x21bb;</Text>
           </Pressable>
         ) : null}
-        {item.completed ? (
-          <Text style={styles.refreshIconText}>&#10003;</Text>
-        ) : null}
+        {item.completed ? <Text style={styles.iconText}>&#10003;</Text> : null}
         <Pressable style={styles.deleteIcon} onPress={onPressDeleteItem(item)}>
           <Text style={styles.deleteIconText}>&#x2717;</Text>
         </Pressable>
@@ -256,7 +254,7 @@ export default function App() {
         <View style={styles.flexContainer} />
         <View style={styles.row}>
           <Button title="Upload" onPress={onPressUpload} />
-          {isUploading && <ActivityIndicator />}
+          {isUploading ? <ActivityIndicator /> : null}
         </View>
       </View>
     </SafeAreaView>
@@ -302,7 +300,7 @@ const styles = StyleSheet.create({
   deleteIconText: {
     fontWeight: '800',
   },
-  refreshIconText: {
+  iconText: {
     fontSize: 64,
     color: '#fff',
     fontWeight: '800',
