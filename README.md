@@ -37,7 +37,7 @@ const { startUpload, abortUpload } = useFileUpload({
 });
 
 const onPressUpload = async () => {
-  const promises = data.map(item => startUpload(item));
+  const promises = data.map((item) => startUpload(item));
   // Use Promise.all instead if you want to throw an error from a timeout or error.
   // As of October 2022 you have to polyfill allSettled in React Native.
   const result = await Promise.allSettled(promises);
@@ -209,7 +209,7 @@ Another downside is fault tolerance. By splitting the files into separate reques
 
 ### How does the local node server throttle the upload requests?
 
-The local node server throttles the upload requests to simulate a real world scenario on a cellular connection or slower network. This helps test out the progress and timeout handling on the client. It does this by using the node `throttle` library. See the `/upload` route in [here](example/server/server.ts) for the details.
+The local node server throttles the upload requests to simulate a real world scenario on a cellular connection or slower network. This helps test out the progress and timeout handling on the client. It does this by using the [node-throttle](https://github.com/TooTallNate/node-throttle) library. See the `/upload` route in [here](example/server/server.ts) for the details.
 
 ### How do I bypass the throttling on the local node server?
 

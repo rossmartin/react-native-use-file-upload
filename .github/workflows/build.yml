@@ -18,7 +18,7 @@ jobs:
           cache: 'npm'
       - name: Install dependencies
         run: yarn
-      - name: lint
+      - name: Lint
         run: yarn lint
       - name: Build package
         run: yarn prepare
