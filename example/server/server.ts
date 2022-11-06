@@ -46,7 +46,7 @@ const upload = multer({
           method: 'POST',
           headers: req.headers,
         },
-        requestResp => {
+        (requestResp) => {
           requestResp.pipe(res);
         }
       )

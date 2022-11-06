@@ -50,27 +50,27 @@ export default function App() {
         keysAndValues: [{ key: 'progress', value: progress }],
       });
     },
-    onDone: data => {
-      console.log('onDone, data: ', data);
+    onDone: (_data) => {
+      //console.log('onDone, data: ', data);
       updateItem({
-        item: data.item,
+        item: _data.item,
         keysAndValues: [{ key: 'completed', value: true }],
       });
     },
-    onError: data => {
-      console.log('onError, data: ', data);
+    onError: (_data) => {
+      //console.log('onError, data: ', data);
       updateItem({
-        item: data.item,
+        item: _data.item,
         keysAndValues: [
           { key: 'progress', value: undefined },
           { key: 'failed', value: true },
         ],
       });
     },
-    onTimeout: data => {
-      console.log('onTimeout, data: ', data);
+    onTimeout: (_data) => {
+      //console.log('onTimeout, data: ', data);
       updateItem({
-        item: data.item,
+        item: _data.item,
         keysAndValues: [
           { key: 'progress', value: undefined },
           { key: 'failed', value: true },
@@ -80,7 +80,7 @@ export default function App() {
   });
 
   const isUploading = useMemo(() => {
-    return data.some(item => {
+    return data.some((item) => {
       return (
         typeof item.progress === 'number' &&
         item.progress > 0 &&
@@ -96,9 +96,9 @@ export default function App() {
     item: Item;
     keysAndValues: { key: K; value: Item[K] }[];
   }) => {
-    setData(prevState => {
+    setData((prevState) => {
       const newState = [...prevState];
-      const itemToUpdate = newState.find(s => s.uri === item.uri);
+      const itemToUpdate = newState.find((s) => s.uri === item.uri);
 
       if (itemToUpdate) {
         keysAndValues.forEach(({ key, value }) => {
@@ -118,36 +118,36 @@ export default function App() {
     });
 
     const items: Item[] =
-      response?.assets?.map(a => ({
+      response?.assets?.map((a) => ({
         name: a.fileName!,
         type: a.type!,
         uri: a.uri!,
       })) ?? [];
 
-    setData(prevState => [...prevState, ...items]);
+    setData((prevState) => [...prevState, ...items]);
   };
 
   const onPressUpload = async () => {
     // allow uploading any that previously failed
-    setData(prevState =>
-      [...prevState].map(item => ({
+    setData((prevState) =>
+      [...prevState].map((item) => ({
         ...item,
         failed: false,
       }))
     );
 
     const promises = data
-      .filter(item => typeof item.progress !== 'number') // leave out any in progress
-      .map(item => startUpload(item));
+      .filter((item) => typeof item.progress !== 'number') // leave out any in progress
+      .map((item) => startUpload(item));
     // use Promise.all here if you want an error from a timeout or error
     const result = await allSettled(promises);
     console.log('result: ', result);
   };
 
   const onPressDeleteItem = (item: Item) => () => {
-    setData(prevState => {
+    setData((prevState) => {
       const newState = [...prevState];
-      const deleteIndex = prevState.findIndex(s => s.uri === item.uri);
+      const deleteIndex = prevState.findIndex((s) => s.uri === item.uri);
 
       if (deleteIndex > -1) {
         newState.splice(deleteIndex, 1);
@@ -226,12 +226,10 @@ export default function App() {
         ) : null}
         {item.failed ? (
           <Pressable onPress={onPressRetry(item)}>
-            <Text style={styles.refreshIconText}>&#x21bb;</Text>
+            <Text style={styles.iconText}>&#x21bb;</Text>
           </Pressable>
         ) : null}
-        {item.completed ? (
-          <Text style={styles.refreshIconText}>&#10003;</Text>
-        ) : null}
+        {item.completed ? <Text style={styles.iconText}>&#10003;</Text> : null}
         <Pressable style={styles.deleteIcon} onPress={onPressDeleteItem(item)}>
           <Text style={styles.deleteIconText}>&#x2717;</Text>
         </Pressable>
@@ -250,13 +248,13 @@ export default function App() {
           onDragRelease={onDragRelease}
           dragStartAnimation={getDragStartAnimation()}
         >
-          {data.map(d => renderItem(d))}
+          {data.map((d) => renderItem(d))}
         </SortableGrid>
 
         <View style={styles.flexContainer} />
         <View style={styles.row}>
           <Button title="Upload" onPress={onPressUpload} />
-          {isUploading && <ActivityIndicator />}
+          {isUploading ? <ActivityIndicator /> : null}
         </View>
       </View>
     </SafeAreaView>
@@ -302,7 +300,7 @@ const styles = StyleSheet.create({
   deleteIconText: {
     fontWeight: '800',
   },
-  refreshIconText: {
+  iconText: {
     fontSize: 64,
     color: '#fff',
     fontWeight: '800',
