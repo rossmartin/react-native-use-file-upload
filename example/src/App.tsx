@@ -3,7 +3,6 @@ import {
   ActivityIndicator,
   Animated,
   Button,
-  ImageBackground,
   Pressable,
   SafeAreaView,
   StyleSheet,
@@ -15,10 +14,12 @@ import SortableGrid, { ItemOrder } from 'react-native-sortable-grid';
 import ReactNativeHapticFeedback, {
   HapticOptions,
 } from 'react-native-haptic-feedback';
+import FastImage from 'react-native-fast-image';
 
 import ProgressBar from './components/ProgressBar';
 import useFileUpload, { UploadItem } from '../../src/index';
 import { allSettled } from './util/allSettled';
+import placeholderImage from './img/placeholder.png';
 
 const hapticFeedbackOptions: HapticOptions = {
   enableVibrateFallback: false,
@@ -114,7 +115,6 @@ export default function App() {
     const response = await launchImageLibrary({
       mediaType: 'photo',
       selectionLimit: 0,
-      quality: 0.8,
     });
 
     const items: Item[] =
@@ -215,12 +215,13 @@ export default function App() {
     const showProgress = !item.failed && itemProgress > 0 && itemProgress < 100;
 
     return (
-      <ImageBackground
-        key={item.uri}
-        source={{ uri: item.uri }}
-        imageStyle={styles.image}
-        style={styles.imageBackground}
-      >
+      <View key={item.uri} style={styles.imageBackground}>
+        <FastImage
+          source={{ uri: item.uri }}
+          style={styles.image}
+          resizeMode={FastImage.resizeMode.cover}
+          defaultSource={placeholderImage}
+        />
         {showProgress ? (
           <ProgressBar value={itemProgress} style={styles.progressBar} />
         ) : null}
@@ -233,7 +234,7 @@ export default function App() {
         <Pressable style={styles.deleteIcon} onPress={onPressDeleteItem(item)}>
           <Text style={styles.deleteIconText}>&#x2717;</Text>
         </Pressable>
-      </ImageBackground>
+      </View>
     );
   };
 
@@ -271,11 +272,12 @@ const styles = StyleSheet.create({
   },
   imageBackground: {
     flex: 1,
+    margin: 8,
     justifyContent: 'center',
     alignItems: 'center',
-    margin: 8,
   },
   image: {
+    ...StyleSheet.absoluteFillObject,
     borderRadius: 12,
   },
   deleteIcon: {
