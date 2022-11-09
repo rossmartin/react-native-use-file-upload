@@ -61,7 +61,7 @@ startUpload({
 
 ### `abortUpload`
 
-Abort a file upload for a given file.
+Abort a file upload for a given file. The promise from `startUpload` gets rejected and `onError` runs if present.
 
 ```ts
 // Pass the uri of a file that started uploading
