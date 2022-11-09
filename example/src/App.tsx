@@ -17,8 +17,8 @@ import ReactNativeHapticFeedback, {
 import FastImage from 'react-native-fast-image';
 
 import ProgressBar from './components/ProgressBar';
-import useFileUpload, { UploadItem } from '../../src/index';
-import { allSettled } from './util/allSettled';
+import useFileUpload, { UploadItem, OnProgressData } from '../../src/index';
+import { allSettled, sleep } from './util/general';
 import placeholderImage from './img/placeholder.png';
 
 const hapticFeedbackOptions: HapticOptions = {
@@ -26,10 +26,11 @@ const hapticFeedbackOptions: HapticOptions = {
   ignoreAndroidSystemSettings: false,
 };
 
-interface Item extends UploadItem {
+export interface Item extends UploadItem {
   progress?: number;
   failed?: boolean; // true on timeout or error
-  completed?: boolean; // true when request is done
+  completedAt?: number; // when request is done
+  startedAt?: number; // when request starts
 }
 
 export default function App() {
@@ -42,20 +43,17 @@ export default function App() {
     // optional below
     method: 'POST',
     timeout: 60000, // you can set this lower to cause timeouts to happen
-    onProgress: ({ item, event }) => {
-      const progress = event?.loaded
-        ? Math.round((event.loaded / event.total) * 100)
-        : 0;
-      updateItem({
-        item,
-        keysAndValues: [{ key: 'progress', value: progress }],
-      });
-    },
+    onProgress,
     onDone: (_data) => {
       //console.log('onDone, data: ', data);
       updateItem({
         item: _data.item,
-        keysAndValues: [{ key: 'completed', value: true }],
+        keysAndValues: [
+          {
+            key: 'completedAt',
+            value: new Date().getTime(),
+          },
+        ],
       });
     },
     onError: (_data) => {
@@ -111,6 +109,43 @@ export default function App() {
     });
   };
 
+  async function onProgress({
+    item,
+    event,
+  }: {
+    item: Item;
+    event: OnProgressData['event'];
+  }) {
+    const progress = event?.loaded
+      ? Math.round((event.loaded / event.total) * 100)
+      : 0;
+
+    // This logic before the else below is a hack to
+    // simulate progress for ones that upload immediately.
+    // This is needed after moving to FastImage?!?!
+    const now = new Date().getTime();
+    const elapsed = now - item.startedAt!;
+    if (progress >= 100 && elapsed <= 200) {
+      for (let i = 0; i <= 100; i += 25) {
+        updateItem({
+          item,
+          keysAndValues: [
+            {
+              key: 'progress',
+              value: i,
+            },
+          ],
+        });
+        await sleep(800);
+      }
+    } else {
+      updateItem({
+        item,
+        keysAndValues: [{ key: 'progress', value: progress }],
+      });
+    }
+  }
+
   const onPressSelectMedia = async () => {
     const response = await launchImageLibrary({
       mediaType: 'photo',
@@ -127,21 +162,29 @@ export default function App() {
     setData((prevState) => [...prevState, ...items]);
   };
 
-  const onPressUpload = async () => {
-    // allow uploading any that previously failed
-    setData((prevState) =>
-      [...prevState].map((item) => ({
-        ...item,
-        failed: false,
-      }))
-    );
-
-    const promises = data
+  // :~)
+  const putItOnTheLine = async (_data: Item[]) => {
+    const promises = _data
       .filter((item) => typeof item.progress !== 'number') // leave out any in progress
       .map((item) => startUpload(item));
     // use Promise.all here if you want an error from a timeout or error
     const result = await allSettled(promises);
     console.log('result: ', result);
+  };
+
+  const onPressUpload = async () => {
+    // allow uploading any that previously failed
+    setData((prevState) => {
+      const newState = [...prevState].map((item) => ({
+        ...item,
+        failed: false,
+        startedAt: new Date().getTime(),
+      }));
+
+      putItOnTheLine(newState);
+
+      return newState;
+    });
   };
 
   const onPressDeleteItem = (item: Item) => () => {
@@ -165,6 +208,10 @@ export default function App() {
         {
           key: 'failed',
           value: false,
+        },
+        {
+          key: 'startedAt',
+          value: new Date().getTime(),
         },
       ],
     });
@@ -230,7 +277,9 @@ export default function App() {
             <Text style={styles.iconText}>&#x21bb;</Text>
           </Pressable>
         ) : null}
-        {item.completed ? <Text style={styles.iconText}>&#10003;</Text> : null}
+        {item.completedAt ? (
+          <Text style={styles.iconText}>&#10003;</Text>
+        ) : null}
         <Pressable style={styles.deleteIcon} onPress={onPressDeleteItem(item)}>
           <Text style={styles.deleteIconText}>&#x2717;</Text>
         </Pressable>
