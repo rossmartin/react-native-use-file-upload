@@ -12,6 +12,7 @@
   "dependencies": {
     "react": "18.1.0",
     "react-native": "0.70.3",
+    "react-native-fast-image": "8.6.3",
     "react-native-haptic-feedback": "1.14.0",
     "react-native-image-picker": "4.10.0",
     "react-native-sortable-grid": "https://github.com/rossmartin/react-native-sortable-grid.git#b5c911c263b8c230c4973af00986724bcb234929"

@@ -70,6 +70,15 @@ export default function useFileUpload({
         reject(result);
       };
 
+      xhr.onabort = () => {
+        const result: OnErrorData = {
+          item,
+          error: 'Request aborted',
+        };
+        onError?.(result);
+        reject(result);
+      };
+
       headers?.forEach((value: string, key: string) => {
         xhr.setRequestHeader(key, value);
       });
