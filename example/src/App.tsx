@@ -26,7 +26,7 @@ const hapticFeedbackOptions: HapticOptions = {
   ignoreAndroidSystemSettings: false,
 };
 
-export interface Item extends UploadItem {
+interface Item extends UploadItem {
   progress?: number;
   failed?: boolean; // true on timeout or error
   completedAt?: number; // when request is done
@@ -121,7 +121,7 @@ export default function App() {
       : 0;
 
     // This logic before the else below is a hack to
-    // simulate progress for ones that upload immediately.
+    // simulate progress for any that upload immediately.
     // This is needed after moving to FastImage?!?!
     const now = new Date().getTime();
     const elapsed = now - item.startedAt!;
