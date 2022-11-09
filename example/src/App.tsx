@@ -44,7 +44,7 @@ export default function App() {
     timeout: 60000, // you can set this lower to cause timeouts to happen
     onProgress: ({ item, event }) => {
       const progress = event?.loaded
-        ? Math.floor((event.loaded / event.total) * 100)
+        ? Math.round((event.loaded / event.total) * 100)
         : 0;
       updateItem({
         item,
