@@ -21,7 +21,7 @@ There is an example app in this repo as shown in the above gif. It is located wi
 ```tsx
 import useFileUpload, { UploadItem } from 'react-native-use-file-upload';
 
-// Used in optional type parameter to useFileUpload
+// Used in optional type parameter for useFileUpload
 interface Item extends UploadItem {
   progress?: number;
 }
