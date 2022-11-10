@@ -5,7 +5,7 @@ export type UploadItem = {
 };
 
 // "T extends UploadItem = UploadItem"
-// Generic type parameter that allows using
+// Generic type parameter that allows passing
 // a custom type that inherits UploadItem (constraint).
 // It defaults to UploadItem when no type argument is passed.
 

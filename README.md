@@ -21,15 +21,22 @@ There is an example app in this repo as shown in the above gif. It is located wi
 ```tsx
 import useFileUpload, { UploadItem } from 'react-native-use-file-upload';
 
+// Used in optional type parameter to useFileUpload
+interface Item extends UploadItem {
+  progress?: number;
+}
+
 // ...
-const [data, setData] = useState<UploadItem[]>([]);
-const { startUpload, abortUpload } = useFileUpload({
+const [data, setData] = useState<Item[]>([]);
+// The generic type param below for useFileUpload is optional
+// and defaults to UploadItem. It should inherit UploadItem.
+const { startUpload, abortUpload } = useFileUpload<Item>({
   url: 'https://example.com/upload',
   field: 'file',
   // Below options are optional
   method: 'POST',
   headers,
-  timeout: 45000,
+  timeout: 60000,
   onProgress,
   onDone,
   onError,
@@ -51,7 +58,7 @@ const onPressUpload = async () => {
 Start a file upload for a given file. Returns a promise that resolves with `OnDoneData` or rejects with `OnErrorData`.
 
 ```ts
-// Objects passed to startUpload should have the below shape (UploadItem type)
+// Objects passed to startUpload should have the below shape at least (UploadItem type)
 startUpload({
   name: 'file.jpg',
   type: 'image/jpg',
@@ -128,7 +135,7 @@ useFileUpload({ headers });
 ```ts
 // OnProgressData type
 {
-  item: UploadItem;
+  item: UploadItem; // or a type that inherits UploadItem
   event: ProgressEvent<EventTarget>;
 };
 // event is the XMLHttpRequest progress event object and it's shape is -
@@ -149,7 +156,7 @@ useFileUpload({ headers });
 ```ts
 // OnDoneData type
 {
-  item: UploadItem;
+  item: UploadItem; // or a type that inherits UploadItem
   responseBody: string; // eg "{\"foo\":\"baz\"}" (JSON) or "foo"
   responseHeaders: string;
 }
@@ -166,7 +173,7 @@ useFileUpload({ headers });
 ```ts
 // onErrorData type
 {
-  item: UploadItem;
+  item: UploadItem; // or a type that inherits UploadItem
   error: string;
 }
 ```
@@ -182,7 +189,7 @@ useFileUpload({ headers });
 ```ts
 // OnErrorData type
 {
-  item: UploadItem;
+  item: UploadItem; // or a type that inherits UploadItem
   error: string;
   timeout: boolean; // true here
 }
