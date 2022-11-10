@@ -37,7 +37,7 @@ export default function App() {
   const [data, setData] = useState<Item[]>([]);
   const dragStartAnimatedValue = useRef(new Animated.Value(1));
 
-  const { startUpload, abortUpload } = useFileUpload({
+  const { startUpload, abortUpload } = useFileUpload<Item>({
     url: 'http://localhost:8080/upload',
     field: 'file',
     // optional below
@@ -109,13 +109,7 @@ export default function App() {
     });
   };
 
-  async function onProgress({
-    item,
-    event,
-  }: {
-    item: Item;
-    event: OnProgressData['event'];
-  }) {
+  async function onProgress({ item, event }: OnProgressData<Item>) {
     const progress = event?.loaded
       ? Math.round((event.loaded / event.total) * 100)
       : 0;

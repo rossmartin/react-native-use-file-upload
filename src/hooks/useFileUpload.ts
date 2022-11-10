@@ -6,7 +6,7 @@ import type {
   UploadItem,
 } from '../types';
 
-export default function useFileUpload({
+export default function useFileUpload<T extends UploadItem = UploadItem>({
   url,
   field,
   method = 'POST',
@@ -16,12 +16,12 @@ export default function useFileUpload({
   onDone,
   onError,
   onTimeout,
-}: FileUploadOptions) {
+}: FileUploadOptions<T>) {
   const requests = useRef<{
     [key: string]: XMLHttpRequest;
   }>({});
 
-  const startUpload = (item: UploadItem): Promise<OnDoneData | OnErrorData> => {
+  const startUpload = (item: T): Promise<OnDoneData<T> | OnErrorData<T>> => {
     return new Promise((resolve, reject) => {
       const formData = new FormData();
       formData.append(field, item);
@@ -41,7 +41,7 @@ export default function useFileUpload({
       if (timeout) {
         xhr.timeout = timeout;
         xhr.ontimeout = () => {
-          const result: OnErrorData = {
+          const result: OnErrorData<T> = {
             item,
             error: xhr.responseText,
             timeout: true,
@@ -52,7 +52,7 @@ export default function useFileUpload({
       }
 
       xhr.onload = () => {
-        const result: OnDoneData = {
+        const result: OnDoneData<T> = {
           item,
           responseBody: xhr.response || xhr.responseText,
           responseHeaders: xhr.getAllResponseHeaders(),
@@ -62,7 +62,7 @@ export default function useFileUpload({
       };
 
       xhr.onerror = () => {
-        const result: OnErrorData = {
+        const result: OnErrorData<T> = {
           item,
           error: xhr.responseText,
         };
@@ -71,7 +71,7 @@ export default function useFileUpload({
       };
 
       xhr.onabort = () => {
-        const result: OnErrorData = {
+        const result: OnErrorData<T> = {
           item,
           error: 'Request aborted',
         };

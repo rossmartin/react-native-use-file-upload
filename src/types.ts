@@ -4,32 +4,37 @@ export type UploadItem = {
   uri: string;
 };
 
-export type OnProgressData = {
-  item: UploadItem;
+// "T extends UploadItem = UploadItem"
+// Generic type parameter that allows using
+// a custom type that inherits UploadItem (constraint).
+// It defaults to UploadItem when no type argument is passed.
+
+export type OnProgressData<T extends UploadItem = UploadItem> = {
+  item: T;
   event: ProgressEvent<EventTarget>;
 };
 
-export type OnDoneData = {
-  item: UploadItem;
+export type OnDoneData<T extends UploadItem = UploadItem> = {
+  item: T;
   responseBody: string;
   responseHeaders: string;
 };
 
-export type OnErrorData = {
-  item: UploadItem;
+export type OnErrorData<T extends UploadItem = UploadItem> = {
+  item: T;
   error: string;
   timeout?: boolean;
 };
 
-export type FileUploadOptions = {
+export type FileUploadOptions<T extends UploadItem = UploadItem> = {
   url: string;
   field: string;
   // optional below
   method?: string;
   headers?: Headers;
   timeout?: number;
-  onProgress?: (data: OnProgressData) => void;
-  onDone?: (data: OnDoneData) => void;
-  onError?: (data: OnErrorData) => void;
-  onTimeout?: (data: OnErrorData) => void;
+  onProgress?: (data: OnProgressData<T>) => void;
+  onDone?: (data: OnDoneData<T>) => void;
+  onError?: (data: OnErrorData<T>) => void;
+  onTimeout?: (data: OnErrorData<T>) => void;
 };
