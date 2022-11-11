@@ -1,6 +1,6 @@
 {
   "name": "react-native-use-file-upload",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "A hook for uploading files using multipart form data with React Native. Provides a simple way to track upload progress, abort an upload, and handle timeouts. Written in TypeScript and no dependencies required.",
   "main": "lib/commonjs/index",
   "module": "lib/module/index",
