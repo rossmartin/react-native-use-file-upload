@@ -37,7 +37,7 @@ export default function App() {
   const [data, setData] = useState<Item[]>([]);
   const dragStartAnimatedValue = useRef(new Animated.Value(1));
 
-  const { startUpload, abortUpload } = useFileUpload({
+  const { startUpload, abortUpload } = useFileUpload<Item>({
     url: 'http://localhost:8080/upload',
     field: 'file',
     // optional below
@@ -109,13 +109,7 @@ export default function App() {
     });
   };
 
-  async function onProgress({
-    item,
-    event,
-  }: {
-    item: Item;
-    event: OnProgressData['event'];
-  }) {
+  async function onProgress({ item, event }: OnProgressData<Item>) {
     const progress = event?.loaded
       ? Math.round((event.loaded / event.total) * 100)
       : 0;
@@ -125,16 +119,16 @@ export default function App() {
     // This is needed after moving to FastImage?!?!
     const now = new Date().getTime();
     const elapsed = now - item.startedAt!;
-    if (progress >= 100 && elapsed <= 200) {
+    if (progress === 100 && elapsed <= 200) {
       for (let i = 0; i <= 100; i += 25) {
-        updateItem({
-          item,
-          keysAndValues: [
-            {
-              key: 'progress',
-              value: i,
-            },
-          ],
+        setData((prevState) => {
+          const newState = [...prevState];
+          const itemToUpdate = newState.find((s) => s.uri === item.uri);
+          if (itemToUpdate) {
+            // item can fail before this hack is done because of the sleep
+            itemToUpdate.progress = itemToUpdate.failed ? undefined : i;
+          }
+          return newState;
         });
         await sleep(800);
       }
@@ -165,7 +159,7 @@ export default function App() {
   // :~)
   const putItOnTheLine = async (_data: Item[]) => {
     const promises = _data
-      .filter((item) => typeof item.progress !== 'number') // leave out any in progress
+      .filter((item) => typeof item.progress !== 'number') // leave out any in progress or completed
       .map((item) => startUpload(item));
     // use Promise.all here if you want an error from a timeout or error
     const result = await allSettled(promises);
@@ -215,10 +209,7 @@ export default function App() {
         },
       ],
     });
-    // wrapped in try/catch here just to get rid of possible unhandled promise warning
-    try {
-      await startUpload(item);
-    } catch (_ex) {}
+    startUpload({ ...item, startedAt: new Date().getTime() }).catch(() => {});
   };
 
   const onDragStart = () => {
