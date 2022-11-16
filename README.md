@@ -14,7 +14,7 @@ yarn add react-native-use-file-upload
 
 ## Example App
 
-There is an example app in this repo as shown in the above gif. It is located within `example` and there is a small node server script within `example/server` [here](example/server/server.ts). You can start the node server within `example` using `yarn server`. The upload route in the node server intentionally throttles the upload requests. You can read more about this in the FAQs below.
+There is an example app in this repo as shown in the above gif. It is located within `example` and there is a small node server script within `example/server` [here](example/server/server.ts). You can start the node server within `example` using `yarn server`. The upload route in the node server intentionally throttles requests to help simulate a real world scenario.
 
 ## Usage
 
