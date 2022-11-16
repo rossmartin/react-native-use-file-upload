@@ -33,7 +33,7 @@ export default function useFileUpload<T extends UploadItem = UploadItem>({
       requests.current[item.uri] = xhr;
 
       if (xhr.upload) {
-        xhr.upload.onprogress = (event: ProgressEvent<EventTarget>) => {
+        xhr.upload.onprogress = (event: ProgressEvent) => {
           onProgress?.({ item, event });
         };
       }

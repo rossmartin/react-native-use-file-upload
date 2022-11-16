@@ -14,7 +14,7 @@ yarn add react-native-use-file-upload
 
 ## Example App
 
-There is an example app in this repo as shown in the above gif. It is located within `example` and there is a small node server script within `example/server` [here](example/server/server.ts). You can start the node server within `example` using `yarn server`. The upload route in the node server intentionally throttles the upload requests. You can read more about this in the FAQs below.
+There is an example app in this repo as shown in the above gif. It is located within `example` and there is a small node server script within `example/server` [here](example/server/server.ts). You can start the node server within `example` using `yarn server`. The upload route in the node server intentionally throttles requests to help simulate a real world scenario.
 
 ## Usage
 
@@ -136,7 +136,7 @@ useFileUpload({ headers });
 // OnProgressData type
 {
   item: UploadItem; // or a type that inherits UploadItem
-  event: ProgressEvent<EventTarget>;
+  event: ProgressEvent;
 };
 // event is the XMLHttpRequest progress event object and it's shape is -
 {
@@ -204,9 +204,9 @@ useFileUpload({ headers });
 
 ### Do requests continue when the app is backgrounded?
 
-Requests will time out if you background the app. This can be addressed by using [react-native-background-upload](https://github.com/Vydia/react-native-background-upload).
+Requests continue when the app is backgrounded on android but they do not on iOS. This can be addressed by using [react-native-background-upload](https://github.com/Vydia/react-native-background-upload).
 
-The React Native team did a a heavy lift to polyfill and bridge `XMLHttpRequest` to the native side for us. [There is an open PR in React Native to allow network requests to run in the background for iOS](https://github.com/facebook/react-native/pull/31838). There are plans to have a similar PR for Android as well. `react-native-background-upload` is great but if backgrounding can be supported without any native dependencies it is a win for everyone.
+The React Native team did a heavy lift to polyfill and bridge `XMLHttpRequest` to the native side for us. [There is an open PR in React Native to allow network requests to run in the background for iOS](https://github.com/facebook/react-native/pull/31838). `react-native-background-upload` is great but if backgrounding can be supported without any external native dependencies it is a win for everyone.
 
 ### Why send 1 file at a time instead of multiple in a single request?
 
