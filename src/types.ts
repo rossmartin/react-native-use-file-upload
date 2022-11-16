@@ -11,7 +11,7 @@ export type UploadItem = {
 
 export type OnProgressData<T extends UploadItem = UploadItem> = {
   item: T;
-  event: ProgressEvent<EventTarget>;
+  event: ProgressEvent;
 };
 
 export type OnDoneData<T extends UploadItem = UploadItem> = {
