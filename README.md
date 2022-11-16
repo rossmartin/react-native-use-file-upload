@@ -136,7 +136,7 @@ useFileUpload({ headers });
 // OnProgressData type
 {
   item: UploadItem; // or a type that inherits UploadItem
-  event: ProgressEvent<EventTarget>;
+  event: ProgressEvent;
 };
 // event is the XMLHttpRequest progress event object and it's shape is -
 {
