@@ -18,7 +18,7 @@ import FastImage from 'react-native-fast-image';
 
 import ProgressBar from './components/ProgressBar';
 import useFileUpload, { UploadItem, OnProgressData } from '../../src/index';
-import { allSettled, sleep } from './util/general';
+import { allSettled } from './util/general';
 import placeholderImage from './img/placeholder.png';
 
 const hapticFeedbackOptions: HapticOptions = {
@@ -44,10 +44,9 @@ export default function App() {
     method: 'POST',
     timeout: 60000, // you can set this lower to cause timeouts to happen
     onProgress,
-    onDone: (_data) => {
-      //console.log('onDone, data: ', data);
+    onDone: ({ item }) => {
       updateItem({
-        item: _data.item,
+        item,
         keysAndValues: [
           {
             key: 'completedAt',
@@ -56,20 +55,18 @@ export default function App() {
         ],
       });
     },
-    onError: (_data) => {
-      //console.log('onError, data: ', data);
+    onError: ({ item }) => {
       updateItem({
-        item: _data.item,
+        item,
         keysAndValues: [
           { key: 'progress', value: undefined },
           { key: 'failed', value: true },
         ],
       });
     },
-    onTimeout: (_data) => {
-      //console.log('onTimeout, data: ', data);
+    onTimeout: ({ item }) => {
       updateItem({
-        item: _data.item,
+        item,
         keysAndValues: [
           { key: 'progress', value: undefined },
           { key: 'failed', value: true },
@@ -114,30 +111,10 @@ export default function App() {
       ? Math.round((event.loaded / event.total) * 100)
       : 0;
 
-    // This logic before the else below is a hack to
-    // simulate progress for any that upload immediately.
-    // This is needed after moving to FastImage?!?!
-    const now = new Date().getTime();
-    const elapsed = now - item.startedAt!;
-    if (progress === 100 && elapsed <= 200) {
-      for (let i = 0; i <= 100; i += 25) {
-        setData((prevState) => {
-          const newState = [...prevState];
-          const itemToUpdate = newState.find((s) => s.uri === item.uri);
-          if (itemToUpdate) {
-            // item can fail before this hack is done because of the sleep
-            itemToUpdate.progress = itemToUpdate.failed ? undefined : i;
-          }
-          return newState;
-        });
-        await sleep(800);
-      }
-    } else {
-      updateItem({
-        item,
-        keysAndValues: [{ key: 'progress', value: progress }],
-      });
-    }
+    updateItem({
+      item,
+      keysAndValues: [{ key: 'progress', value: progress }],
+    });
   }
 
   const onPressSelectMedia = async () => {
