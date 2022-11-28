@@ -1,6 +1,6 @@
 {
   "name": "react-native-use-file-upload",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "A hook for uploading files using multipart form data with React Native. Provides a simple way to track upload progress, abort an upload, and handle timeouts. Written in TypeScript and no dependencies required.",
   "main": "lib/commonjs/index",
   "module": "lib/module/index",
@@ -38,7 +38,11 @@
   "keywords": [
     "react-native",
     "ios",
-    "android"
+    "android",
+    "file",
+    "upload",
+    "uploader",
+    "photo"
   ],
   "repository": "https://github.com/rossmartin/react-native-use-file-upload",
   "author": "Ross Martin <2498502+rossmartin@users.noreply.github.com> (https://github.com/rossmartin)",
