@@ -21,7 +21,7 @@ export default function useFileUpload<T extends UploadItem = UploadItem>({
     [key: string]: XMLHttpRequest;
   }>({});
 
-  const startUpload = (item: T): Promise<OnDoneData<T> | OnErrorData<T>> => {
+  const startUpload = (item: T): Promise<OnDoneData<T>> => {
     return new Promise((resolve, reject) => {
       const formData = new FormData();
       formData.append(field, item);
