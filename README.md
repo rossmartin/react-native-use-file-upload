@@ -14,7 +14,7 @@ yarn add react-native-use-file-upload
 
 ## Example App
 
-There is an example app in this repo as shown in the above gif. It is located within `example` and there is a small node server script within `example/server` [here](example/server/server.ts). You can start the node server within `example` using `yarn server`. The upload route in the node server intentionally throttles requests to help simulate a real world scenario.
+There is an example app in this repo as shown in the above gif. It is located within `example` and there is a small node server script within `example/server` [here](example/server/server.ts). You can start the node server within `example` using `yarn server`.
 
 ## Usage
 
@@ -208,23 +208,23 @@ Requests continue when the app is backgrounded on android but they do not on iOS
 
 The React Native team did a heavy lift to polyfill and bridge `XMLHttpRequest` to the native side for us. [There is an open PR in React Native to allow network requests to run in the background for iOS](https://github.com/facebook/react-native/pull/31838). `react-native-background-upload` is great but if backgrounding can be supported without any external native dependencies it is a win for everyone.
 
+### How can I throttle the file uploads so that I can simulate a real world scenario where upload progress takes time?
+
+You can throttle the file uploads by using [ngrok](https://ngrok.com/) and [Network Link Conditioner](https://developer.apple.com/download/more/?q=Additional%20Tools). Once you have ngrok installed you can start a HTTP tunnel forwarding to the local node server on port 8080 via:
+
+```sh
+ngrok http 8080
+```
+
+ngrok will generate a forwarding URL to the local node server and you should set this as the `url` for `useFileUpload`. This will make your device/simulator make the requests against the ngrok forwarding URL.
+
+You can throttle your connection using Network Link Conditioner if needed. The existing Wifi profile with a 33 Mbps upload works well and you can add a custom profile also. If your upload speed is faster than 100 Mbps you'll see a difference by throttling with Network Link Conditioner. You might not need to throttle with Network Link Conditioner depending on your connection upload speed.
+
 ### Why send 1 file at a time instead of multiple in a single request?
 
 It is possible to to send multiple files in 1 request. There are downsides to this approach though and the main one is that it is slower. A client has the ability to handle multiple server connections simultaneously, allowing the files to stream in parallel. This folds the upload time over on itself.
 
 Another downside is fault tolerance. By splitting the files into separate requests, this strategy allows for a file upload to fail in isolation. If the connection fails for the request, or the file is invalidated by the server, or any other reason, that file upload will fail by itself and won't affect any of the other uploads.
-
-### How does the local node server throttle the upload requests?
-
-The local node server throttles the upload requests to simulate a real world scenario on a cellular connection or slower network. This helps test out the progress and timeout handling on the client. It does this by using the [node-throttle](https://github.com/TooTallNate/node-throttle) library. See the `/upload` route in [here](example/server/server.ts) for the details.
-
-### How do I bypass the throttling on the local node server?
-
-Set the `url` in `useFileUpload` to `http://localhost:8080/_upload`.
-
-### The `onDone` and promise from `startUpload` take awhile to resolve in the example app.
-
-This is because of the throttling and can be bypassed.
 
 ### Why is `type` and `name` required in the `UploadItem` type?
 

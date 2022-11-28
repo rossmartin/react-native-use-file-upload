@@ -24,12 +24,10 @@
     "@types/multer": "1.4.7",
     "@types/node": "18.11.3",
     "@types/react-native-sortable-grid": "2.0.4",
-    "@types/throttle": "1.0.1",
     "babel-plugin-module-resolver": "^4.1.0",
     "express": "4.18.2",
     "metro-react-native-babel-preset": "0.72.3",
     "multer": "1.4.5-lts.1",
-    "throttle": "1.0.3",
     "ts-node": "10.9.1"
   }
 }
