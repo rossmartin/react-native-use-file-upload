@@ -16,8 +16,12 @@ export default function ProgressBar({
   style,
   progressColor = '#3880ff',
 }: Props) {
-  const [layoutWidth, setLayoutWidth] = useState<number>(0);
+  const [layoutWidth, setLayoutWidth] = useState<number>();
   const animatedStyle = useAnimatedStyle(() => {
+    if (!layoutWidth) {
+      return { width: 0 };
+    }
+
     // subtract 2 to account for border
     const widthValue = (value / 100) * layoutWidth - 2;
     return {
