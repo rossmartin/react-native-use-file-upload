@@ -1,4 +1,4 @@
-import React, { useRef, useMemo, useState } from 'react';
+import React, { useRef, useState } from 'react';
 import {
   ActivityIndicator,
   Animated,
@@ -38,7 +38,7 @@ export default function App() {
   const dragStartAnimatedValue = useRef(new Animated.Value(1));
 
   const { startUpload, abortUpload } = useFileUpload<Item>({
-    url: 'http://localhost:8080/upload',
+    url: 'https://26fe-181-215-182-205.ngrok.io/upload',
     field: 'file',
     // optional below
     method: 'POST',
@@ -75,15 +75,12 @@ export default function App() {
     },
   });
 
-  const isUploading = useMemo(() => {
-    return data.some((item) => {
-      return (
-        typeof item.progress === 'number' &&
-        item.progress > 0 &&
-        item.progress < 100
-      );
-    });
-  }, [data]);
+  const isUploading = data.some(
+    (item) =>
+      typeof item.progress === 'number' &&
+      item.progress > 0 &&
+      item.progress < 100
+  );
 
   const updateItem = <K extends keyof Item>({
     item,
