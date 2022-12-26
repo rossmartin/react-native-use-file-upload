@@ -1,5 +1,9 @@
-import React, { useRef, useEffect } from 'react';
-import { Animated, StyleProp, StyleSheet, View, ViewStyle } from 'react-native';
+import React, { useState } from 'react';
+import { StyleProp, StyleSheet, View, ViewStyle } from 'react-native';
+import Animated, {
+  useAnimatedStyle,
+  withSpring,
+} from 'react-native-reanimated';
 
 type Props = {
   value: number;
@@ -12,27 +16,28 @@ export default function ProgressBar({
   style,
   progressColor = '#3880ff',
 }: Props) {
-  const valueAnimated = useRef(new Animated.Value(0)).current;
-  const width = valueAnimated.interpolate({
-    inputRange: [0, 100],
-    outputRange: ['0%', '100%'],
-    extrapolate: 'clamp',
-  });
-
-  useEffect(() => {
-    Animated.timing(valueAnimated, {
-      toValue: value,
-      duration: 500,
-      useNativeDriver: false,
-    }).start();
-  }, [value, valueAnimated]);
+  const [layoutWidth, setLayoutWidth] = useState<number>(0);
+  const animatedStyle = useAnimatedStyle(() => {
+    // subtract 2 to account for border
+    const widthValue = (value / 100) * layoutWidth - 2;
+    return {
+      width: withSpring(widthValue, {
+        overshootClamping: true,
+        stiffness: 75,
+      }),
+    };
+  }, [layoutWidth, value]);
 
   return (
-    <View style={[styles.progressBar, style]}>
+    <View
+      style={[styles.container, style]}
+      onLayout={(event) => setLayoutWidth(event.nativeEvent.layout.width)}
+    >
       <Animated.View
         style={[
           StyleSheet.absoluteFill,
-          { backgroundColor: progressColor, width },
+          animatedStyle,
+          { backgroundColor: progressColor },
         ]}
       />
     </View>
@@ -40,9 +45,8 @@ export default function ProgressBar({
 }
 
 const styles = StyleSheet.create({
-  progressBar: {
+  container: {
     height: 10,
-    width: '100%',
     backgroundColor: '#fff',
     borderColor: '#708090',
     borderWidth: 1,
