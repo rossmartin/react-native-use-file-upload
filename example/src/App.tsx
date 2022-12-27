@@ -1,4 +1,4 @@
-import React, { useRef, useMemo, useState } from 'react';
+import React, { useRef, useState } from 'react';
 import {
   ActivityIndicator,
   Animated,
@@ -29,8 +29,7 @@ const hapticFeedbackOptions: HapticOptions = {
 interface Item extends UploadItem {
   progress?: number;
   failed?: boolean; // true on timeout or error
-  completedAt?: number; // when request is done
-  startedAt?: number; // when request starts
+  completed?: boolean;
 }
 
 export default function App() {
@@ -42,15 +41,15 @@ export default function App() {
     field: 'file',
     // optional below
     method: 'POST',
-    timeout: 60000, // you can set this lower to cause timeouts to happen
+    timeout: 60 * 1000, // you can set this lower to cause timeouts to happen
     onProgress,
     onDone: ({ item }) => {
       updateItem({
         item,
         keysAndValues: [
           {
-            key: 'completedAt',
-            value: new Date().getTime(),
+            key: 'completed',
+            value: true,
           },
         ],
       });
@@ -75,15 +74,12 @@ export default function App() {
     },
   });
 
-  const isUploading = useMemo(() => {
-    return data.some((item) => {
-      return (
-        typeof item.progress === 'number' &&
-        item.progress > 0 &&
-        item.progress < 100
-      );
-    });
-  }, [data]);
+  const isUploading = data.some(
+    (item) =>
+      typeof item.progress === 'number' &&
+      item.progress > 0 &&
+      item.progress < 100
+  );
 
   const updateItem = <K extends keyof Item>({
     item,
@@ -106,7 +102,7 @@ export default function App() {
     });
   };
 
-  async function onProgress({ item, event }: OnProgressData<Item>) {
+  function onProgress({ item, event }: OnProgressData<Item>) {
     const progress = event?.loaded
       ? Math.round((event.loaded / event.total) * 100)
       : 0;
@@ -133,7 +129,6 @@ export default function App() {
     setData((prevState) => [...prevState, ...items]);
   };
 
-  // :~)
   const putItOnTheLine = async (_data: Item[]) => {
     const promises = _data
       .filter((item) => typeof item.progress !== 'number') // leave out any in progress or completed
@@ -143,13 +138,12 @@ export default function App() {
     console.log('result: ', result);
   };
 
-  const onPressUpload = async () => {
+  const onPressUpload = () => {
     // allow uploading any that previously failed
     setData((prevState) => {
       const newState = [...prevState].map((item) => ({
         ...item,
         failed: false,
-        startedAt: new Date().getTime(),
       }));
 
       putItOnTheLine(newState);
@@ -172,7 +166,7 @@ export default function App() {
     abortUpload(item.uri);
   };
 
-  const onPressRetry = (item: Item) => async () => {
+  const onPressRetry = (item: Item) => () => {
     updateItem({
       item,
       keysAndValues: [
@@ -180,18 +174,15 @@ export default function App() {
           key: 'failed',
           value: false,
         },
-        {
-          key: 'startedAt',
-          value: new Date().getTime(),
-        },
       ],
     });
-    startUpload({ ...item, startedAt: new Date().getTime() }).catch(() => {});
+    startUpload({ ...item, failed: false }).catch(() => {});
   };
 
   const onDragStart = () => {
     ReactNativeHapticFeedback.trigger('impactMedium', hapticFeedbackOptions);
     dragStartAnimatedValue.current.setValue(1);
+    // unable to set useNativeDriver true because of a limitation in react-native-sortable-grid
     Animated.loop(
       Animated.sequence([
         Animated.timing(dragStartAnimatedValue.current, {
@@ -210,6 +201,7 @@ export default function App() {
 
   const onDragRelease = (_itemOrder: ItemOrder) => {
     //console.log('onDragRelease, itemOrder: ', _itemOrder);
+    // you can see where this can go :~)
   };
 
   const getDragStartAnimation = () => {
@@ -245,9 +237,7 @@ export default function App() {
             <Text style={styles.iconText}>&#x21bb;</Text>
           </Pressable>
         ) : null}
-        {item.completedAt ? (
-          <Text style={styles.iconText}>&#10003;</Text>
-        ) : null}
+        {item.completed ? <Text style={styles.iconText}>&#10003;</Text> : null}
         <Pressable style={styles.deleteIcon} onPress={onPressDeleteItem(item)}>
           <Text style={styles.deleteIconText}>&#x2717;</Text>
         </Pressable>
