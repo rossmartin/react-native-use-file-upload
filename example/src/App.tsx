@@ -176,7 +176,7 @@ export default function App() {
         },
       ],
     });
-    startUpload({ ...item }).catch(() => {});
+    startUpload({ ...item, failed: false }).catch(() => {});
   };
 
   const onDragStart = () => {
