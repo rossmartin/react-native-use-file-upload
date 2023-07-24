@@ -106,6 +106,12 @@ abortUpload('file://some-local-file.jpg');
     <td>The HTTP method for the request. Defaults to "POST".</td>
   </tr>
   <tr>
+    <td>data</td>
+    <td>object</td>
+    <td>Optional</td>
+    <td>An object of additional FormData fields to be set with the request.</td>
+  </tr>
+  <tr>
     <td>headers</td>
     <td>Headers</td>
     <td>Optional</td>
@@ -163,7 +169,7 @@ useFileUpload({ headers });
 ```
 
 </td>
-  </tr>  
+  </tr>
   <tr>
     <td>onError</td>
     <td>function</td>
@@ -196,7 +202,7 @@ useFileUpload({ headers });
 ```
 
 </td>
-  </tr> 
+  </tr>
 </tbody>
 </table>
 

@@ -33,6 +33,7 @@ export type FileUploadOptions<T extends UploadItem = UploadItem> = {
   method?: string;
   headers?: Headers;
   timeout?: number;
+  data?: {[key: string]: string};
   onProgress?: (data: OnProgressData<T>) => void;
   onDone?: (data: OnDoneData<T>) => void;
   onError?: (data: OnErrorData<T>) => void;
