@@ -12,6 +12,7 @@ export default function useFileUpload<T extends UploadItem = UploadItem>({
   method = 'POST',
   headers,
   timeout,
+  data,
   onProgress,
   onDone,
   onError,
@@ -25,6 +26,10 @@ export default function useFileUpload<T extends UploadItem = UploadItem>({
     return new Promise((resolve, reject) => {
       const formData = new FormData();
       formData.append(field, item);
+
+      if (data)
+        for (const key in data)
+          formData.append(key, data[key]);
 
       const xhr = new XMLHttpRequest();
 
