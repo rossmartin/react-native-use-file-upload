@@ -27,9 +27,11 @@ export default function useFileUpload<T extends UploadItem = UploadItem>({
       const formData = new FormData();
       formData.append(field, item);
 
-      if (data)
-        for (const key in data)
+      if (data) {
+        for (const key in data) {
           formData.append(key, data[key]);
+        }
+      }
 
       const xhr = new XMLHttpRequest();
 
