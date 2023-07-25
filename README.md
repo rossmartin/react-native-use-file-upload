@@ -35,8 +35,9 @@ const { startUpload, abortUpload } = useFileUpload<Item>({
   field: 'file',
   // Below options are optional
   method: 'POST',
+  data,
   headers,
-  timeout: 60000,
+  timeout: 60 * 1000, // 60 seconds
   onProgress,
   onDone,
   onError,
